@@ -1,0 +1,3 @@
+com.tnl.vop.security.SecurityAutoConfiguration
+com.tnl.vop.security.propagation.TokenPropagationWebClientConfig
+com.tnl.vop.security.propagation.TokenPropagationRestTemplateConfig

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- Turbo filter for masking -->
+    <turboFilter class="com.tnl.vop.logging.MaskingTurboFilter"/>
+
+    <property name="APP_NAME" value="${spring.application.name:-vop-app}"/>
+    <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
+    <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
+
+    <!-- === JSON layout with Logstash encoder === -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <pattern>
+                    <pattern>
+                        {
+                        "level": "%level",
+                        "logger": "%logger{36}",
+                        "thread": "%thread",
+                        "message": "%msg",
+                        "correlationId": "%X{correlationId}",
+                        "app": "${APP_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+                <mdc/>           <!-- include all MDC entries -->
+                <context/>       <!-- context properties -->
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Rolling file for prod -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${APP_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <version/>
+                <pattern>
+                    <pattern>
+                        {
+                        "level": "%level",
+                        "logger": "%logger{36}",
+                        "thread": "%thread",
+                        "message": "%msg",
+                        "correlationId": "%X{correlationId}",
+                        "app": "${APP_NAME}"
+                        }
+                    </pattern>
+                </pattern>
+                <mdc/>
+                <context/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Profiles -->
+    <springProfile name="local,dev">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="JSON_CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!local & !dev">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="JSON_CONSOLE"/>
+            <appender-ref ref="JSON_FILE"/>
+        </root>
+    </springProfile>
+</configuration>

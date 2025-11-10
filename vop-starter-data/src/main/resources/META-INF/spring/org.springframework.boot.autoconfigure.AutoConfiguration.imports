@@ -1,0 +1,3 @@
+com.tnl.vop.data.VopDataAutoConfiguration
+com.tnl.vop.data.redis.RedisAutoConfiguration
+com.tnl.vop.data.redis.EmbeddedRedisAutoConfiguration

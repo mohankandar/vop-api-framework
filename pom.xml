@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tnl.vop</groupId>
+    <artifactId>vop</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>VOP :: Root Aggregator</name>
+    <description>Aggregates all VOP framework modules.</description>
+
+    <modules>
+        <module>vop-bom</module>
+        <module>vop-parent</module>
+        <module>vop-core</module>
+        <module>vop-autoconfigure</module>
+        <module>vop-logging-config</module>
+        <module>vop-search-core</module>
+        <module>vop-data-jpa</module>
+        <module>vop-starter-data</module>
+        <module>vop-starter-identity-client</module>
+        <module>vop-starter-security</module>
+        <module>vop-starter-platform</module>
+        <module>vop-demo-service</module>
+    </modules>
+</project>

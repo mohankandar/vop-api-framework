@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.tnl.vop</groupId>
+        <artifactId>vop-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../vop-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>vop-starter-identity-client</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>VOP :: Starter :: Identity Client</name>
+    <description>Resolve identity from JWT claims and/or an HTTP identity service</description>
+
+    <dependencies>
+        <!-- Spring Security types for JwtAuthenticationToken (optional compile) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- provides org.springframework.security.oauth2.jwt.Jwt -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- HTTP clients (both optional; we wire conditionally) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId> <!-- RestTemplateBuilder -->
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Cache annotations if the app enables a CacheManager (e.g., Redis) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <!-- Our basics -->
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>

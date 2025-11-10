@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.tnl.vop</groupId>
+        <artifactId>vop-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../vop-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>vop-demo-service</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>VOP :: Demo Service</name>
+    <description>Demo exercising all VOP framework modules</description>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- VOP framework -->
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-starter-platform</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-starter-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-data-jpa</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-starter-data</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-starter-identity-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-logging-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- DB driver: H2 for local/demo -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Web clients (optional; for propagation demo) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <!-- JPA for entities/repositories/auditing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.tnl.vop</groupId>
+        <artifactId>vop-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <relativePath>../vop-parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>vop-starter-security</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>VOP :: Starter :: Security</name>
+    <description>Inbound JWT/API Key auth + unified principal; outbound token propagation</description>
+
+    <dependencies>
+        <!-- Spring Security (resource server JWT + client if needed later) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+
+        <!-- Our core + autoconfig -->
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tnl.vop</groupId>
+            <artifactId>vop-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Servlet + MVC APIs for filters (compile), servlet API provided by container -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- WebClient types (optional) -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webflux</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- RestTemplateBuilder lives in spring-boot (optional) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+</project>
