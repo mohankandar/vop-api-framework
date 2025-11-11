@@ -16,19 +16,31 @@ public class TokenPropagationWebClientConfig {
     @Bean
     public ExchangeFilterFunction bearerPropagationFilter() {
         return (request, next) -> {
-            var ctx = SecurityContextHolder.getContext();
-            var auth = ctx == null ? null : ctx.getAuthentication();
-            String token = (auth != null && auth.getCredentials() != null)
-                    ? String.valueOf(auth.getCredentials()) : null;
+            var ctx  = SecurityContextHolder.getContext();
+            var auth = (ctx != null) ? ctx.getAuthentication() : null;
+
+            final String token = resolveBearerToken(auth);
 
             ClientRequest mutated = (token != null && !token.isBlank())
-                    ? ClientRequest
-                    .from(request)
-                    .headers(h -> h.set(HttpHeaders.AUTHORIZATION, "Bearer " + token))
-                    .build()
-                    : request;
+                ? ClientRequest.from(request)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .build()
+                : request;
 
             return next.exchange(mutated);
         };
+    }
+
+    private static String resolveBearerToken(org.springframework.security.core.Authentication auth) {
+        if (auth instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken jat) {
+            return jat.getToken().getTokenValue();
+        }
+        if (auth instanceof org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication bta) {
+            return bta.getToken().getTokenValue();
+        }
+        if (auth != null && auth.getCredentials() instanceof String s && !s.isBlank()) {
+            return s; // fallback (e.g., API key)
+        }
+        return null;
     }
 }

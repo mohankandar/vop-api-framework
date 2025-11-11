@@ -4,28 +4,30 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
-
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
 springdoc:
-  api-docs.enabled: true
-  swagger-ui.enabled: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 vop:
+  data:
+    redis:
+      embedded:
+        enabled: true
+        port: 6379
+        only-when-local-profile: true
   security:
-    # Allow API key only for local testing
     api-key:
+      enabled: true
+      header: X-API-Key
       value: local-key
-    web:
-      permit-paths:
-        - /public/**
-        - /files/download/**
-
-# H2 console (optional)
-#spring:
-#  h2:
-#    console:
-#      enabled: true
-#      path: /h2

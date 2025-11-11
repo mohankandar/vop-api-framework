@@ -26,7 +26,8 @@ management:
 vop:
   security:
     api-key:
-      header-name: X-API-Key
+      enabled: false
+      header: X-API-Key
       value: ${VOP_API_KEY:dev-key}   # for local quick tests
   identity:
     http-enabled: false              # enable in non-local to enrich via HTTP
