@@ -1,59 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.tnl.vop</groupId>
-        <artifactId>vop-parent</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
-        <relativePath>../vop-parent/pom.xml</relativePath>
-    </parent>
-
-    <artifactId>vop-starter-data</artifactId>
+  <parent>
+    <groupId>com.tnl.vop</groupId>
+    <artifactId>vop-parent</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <name>VOP :: Starter :: Data</name>
-    <description>JDBC + Liquibase + Redis (with optional embedded Redis for local)</description>
+    <relativePath>../vop-parent/pom.xml</relativePath>
+  </parent>
 
-    <dependencies>
-        <!-- Core Spring data bits (no JPA) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
+  <artifactId>vop-starter-data</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <name>VOP :: Starter :: Data</name>
+  <description>JDBC + Liquibase + Redis (with optional embedded Redis for local)</description>
 
-        <!-- Liquibase (Boot autoconfig kicks in when this is present) -->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
+  <dependencies>
+    <!-- Core Spring data bits (no JPA) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
 
-        <!-- Redis (connection + template). Apps can set spring.cache.type=redis if they want CacheManager -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+    <!-- Liquibase (Boot autoconfig kicks in when this is present) -->
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+    </dependency>
 
-        <!-- Optional: embedded Redis for local dev (class: redis.embedded.RedisServer).
-             Kept optional so it never leaks into prod images. -->
-        <dependency>
-            <groupId>com.github.codemonstur</groupId>
-            <artifactId>embedded-redis</artifactId>
-            <version>1.4.3</version>
-            <optional>true</optional>
-        </dependency>
+    <!-- Redis (connection + template). Apps can set spring.cache.type=redis if they want CacheManager -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
 
-        <!-- Our shared glue -->
-        <dependency>
-            <groupId>com.tnl.vop</groupId>
-            <artifactId>vop-autoconfigure</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.tnl.vop</groupId>
-            <artifactId>vop-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
+    <!-- Optional: embedded Redis for local dev (class: redis.embedded.RedisServer).
+         Kept optional so it never leaks into prod images. -->
+    <dependency>
+      <groupId>com.github.codemonstur</groupId>
+      <artifactId>embedded-redis</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Our shared glue -->
+    <dependency>
+      <groupId>com.tnl.vop</groupId>
+      <artifactId>vop-autoconfigure</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tnl.vop</groupId>
+      <artifactId>vop-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

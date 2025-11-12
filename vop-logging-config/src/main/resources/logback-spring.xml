@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="30 seconds">
-    <!-- Turbo filter for masking -->
-    <turboFilter class="com.tnl.vop.logging.MaskingTurboFilter"/>
 
-    <property name="APP_NAME" value="${spring.application.name:-vop-app}"/>
+    <!-- Mandatory masking -->
+    <turboFilter class="com.tnl.vop.platform.logging.MaskingTurboFilter"/>
+
+    <!-- Properties -->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="vop-app"/>
     <property name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}"/>
+    <property name="LOG_FILE_ENABLED" value="${LOG_FILE_ENABLED:-false}"/>
     <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
+    <property name="ROLLING_MAX_HISTORY" value="${ROLLING_MAX_HISTORY:-14}"/>
+    <property name="ROLLING_MAX_FILE_SIZE" value="${ROLLING_MAX_FILE_SIZE:-50MB}"/>
+    <property name="TOTAL_SIZE_CAP" value="${TOTAL_SIZE_CAP:-2GB}"/>
 
-    <!-- === JSON layout with Logstash encoder === -->
+    <!-- Console JSON -->
     <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
@@ -16,63 +22,74 @@
                 <pattern>
                     <pattern>
                         {
-                        "level": "%level",
-                        "logger": "%logger{36}",
-                        "thread": "%thread",
-                        "message": "%msg",
-                        "correlationId": "%X{correlationId}",
-                        "app": "${APP_NAME}"
-                        }
-                    </pattern>
-                </pattern>
-                <mdc/>           <!-- include all MDC entries -->
-                <context/>       <!-- context properties -->
-                <stackTrace/>
-            </providers>
-        </encoder>
-    </appender>
-
-    <!-- Rolling file for prod -->
-    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/${APP_NAME}.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.gz</fileNamePattern>
-            <maxHistory>14</maxHistory>
-        </rollingPolicy>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp/>
-                <version/>
-                <pattern>
-                    <pattern>
-                        {
-                        "level": "%level",
-                        "logger": "%logger{36}",
-                        "thread": "%thread",
-                        "message": "%msg",
-                        "correlationId": "%X{correlationId}",
-                        "app": "${APP_NAME}"
+                        "level":"%level",
+                        "logger":"%logger{36}",
+                        "thread":"%thread",
+                        "message":"%message",
+                        "traceId":"%X{traceId}",
+                        "spanId":"%X{spanId}",
+                        "correlationId":"%X{correlationId}",
+                        "user":"%X{user}",
+                        "app":"${APP_NAME}"
                         }
                     </pattern>
                 </pattern>
                 <mdc/>
-                <context/>
                 <stackTrace/>
             </providers>
         </encoder>
     </appender>
 
-    <!-- Profiles -->
-    <springProfile name="local,dev">
-        <root level="${LOG_LEVEL}">
-            <appender-ref ref="JSON_CONSOLE"/>
-        </root>
-    </springProfile>
+    <!-- File JSON (defined only when enabled) -->
+    <if condition='property("LOG_FILE_ENABLED").equalsIgnoreCase("true")'>
+        <then>
+            <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>${LOG_PATH}/${APP_NAME}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                        <maxFileSize>${ROLLING_MAX_FILE_SIZE}</maxFileSize>
+                    </timeBasedFileNamingAndTriggeringPolicy>
+                    <maxHistory>${ROLLING_MAX_HISTORY}</maxHistory>
+                    <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+                </rollingPolicy>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp/><version/>
+                        <pattern>
+                            <pattern>
+                                {
+                                "level":"%level",
+                                "logger":"%logger{36}",
+                                "thread":"%thread",
+                                "message":"%message",
+                                "traceId":"%X{traceId}",
+                                "spanId":"%X{spanId}",
+                                "correlationId":"%X{correlationId}",
+                                "user":"%X{user}",
+                                "app":"${APP_NAME}"
+                                }
+                            </pattern>
+                        </pattern>
+                        <mdc/><stackTrace/>
+                    </providers>
+                </encoder>
+            </appender>
+        </then>
+    </if>
 
-    <springProfile name="!local & !dev">
-        <root level="${LOG_LEVEL}">
-            <appender-ref ref="JSON_CONSOLE"/>
-            <appender-ref ref="JSON_FILE"/>
-        </root>
-    </springProfile>
+    <!-- Choose root logger (no nested <if> inside <root>) -->
+    <if condition='property("LOG_FILE_ENABLED").equalsIgnoreCase("true")'>
+        <then>
+            <root level="${LOG_LEVEL}">
+                <appender-ref ref="JSON_CONSOLE"/>
+                <appender-ref ref="JSON_FILE"/>
+            </root>
+        </then>
+        <else>
+            <root level="${LOG_LEVEL}">
+                <appender-ref ref="JSON_CONSOLE"/>
+            </root>
+        </else>
+    </if>
 </configuration>

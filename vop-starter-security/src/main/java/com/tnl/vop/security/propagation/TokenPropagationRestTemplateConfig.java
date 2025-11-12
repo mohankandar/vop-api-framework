@@ -12,19 +12,28 @@ import org.springframework.web.client.RestTemplate;
 @ConditionalOnClass({RestTemplate.class, RestTemplateBuilder.class})
 public class TokenPropagationRestTemplateConfig {
 
-    @Bean
-    public RestTemplate restTemplateWithBearer(RestTemplateBuilder builder) {
-        return builder
-                .additionalInterceptors((req, body, ex) -> {
-                    var ctx = SecurityContextHolder.getContext();
-                    var auth = ctx == null ? null : ctx.getAuthentication();
-                    String token = (auth != null && auth.getCredentials() != null)
-                            ? String.valueOf(auth.getCredentials()) : null;
-                    if (token != null && !token.isBlank()) {
-                        req.getHeaders().set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-                    }
-                    return ex.execute(req, body);
-                })
-                .build();
-    }
+  @Bean
+  public RestTemplate restTemplateWithBearer(RestTemplateBuilder builder) {
+    return builder
+        .additionalInterceptors((req, body, ex) -> {
+          var ctx = SecurityContextHolder.getContext();
+          var auth = (ctx != null) ? ctx.getAuthentication() : null;
+
+          String token = null;
+          if (auth instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken jat) {
+            token = jat.getToken().getTokenValue();
+          } else if (auth instanceof org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication bta) {
+            token = bta.getToken().getTokenValue();
+          } else if (auth != null && auth.getCredentials() instanceof String s && !s.isBlank()) {
+            token = s; // fallback (e.g., API key pre-auth)
+          }
+
+          if (token != null && !token.isBlank()) {
+            req.getHeaders().set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+          }
+          return ex.execute(req, body);
+        })
+        .build();
+  }
+
 }
