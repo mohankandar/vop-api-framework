@@ -1,5 +1,6 @@
 package com.tnl.vop.security.token;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -7,9 +8,13 @@ import io.jsonwebtoken.security.Keys;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotBlank;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
@@ -61,12 +66,27 @@ public class TokenEndpointController {
     this.key = Keys.hmacShaKeyFor(bytes);
   }
 
-  @Operation(
-      summary = "Generate a short-lived JWT for manual testing",
-      description = "Always documented. Enabled/disabled via vop.security.token-endpoint.enabled."
+  @Operation(summary = "Generate a short-lived JWT for manual testing")
+  @io.swagger.v3.oas.annotations.parameters.RequestBody(
+      description = "Required: userId. Optional: aud, roles.",
+      required = true,
+      content = @Content(
+          mediaType = "application/json",
+          examples = {
+              @ExampleObject(
+                  name = "Minimal",
+                  value = "{\n  \"userId\": \"user123\"\n}"
+              ),
+              @ExampleObject(
+                  name = "With roles and audience",
+                  value = "{\n  \"userId\": \"user123\",\n  \"aud\": \"vop-demo-client\",\n  \"roles\": [\"ROLE_USER\",\"ROLE_ADMIN\"]\n}"
+              )
+          }
+      )
   )
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> issue(@RequestBody TokenRequest req, HttpServletRequest http) {
+    String subject = org.springframework.util.StringUtils.hasText(req.userId) ? req.userId : "user";
     if (!props.isEnabled()) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN)
           .body(new ErrorBody("TOKEN_ISSUANCE_DISABLED", "Token issuance is disabled in this environment."));
@@ -76,7 +96,6 @@ public class TokenEndpointController {
     var exp = now.plusSeconds(props.getExpirySeconds());
 
     var roles = (req.roles == null || req.roles.isEmpty()) ? List.of("ROLE_USER") : req.roles;
-    String subject = StringUtils.hasText(req.sub) ? req.sub : "user";
 
     var jwtBuilder = Jwts.builder()
         .setIssuer(props.getIssuer())
@@ -111,25 +130,34 @@ public class TokenEndpointController {
     return ResponseEntity.ok()
         .header(HttpHeaders.CACHE_CONTROL, "no-store")
         .header("Pragma", "no-cache")
-        .body(new TokenResponse(token, exp.toString(), props.getIssuer()));
+        .contentType(MediaType.TEXT_PLAIN)
+        .body(token);
   }
 
+  @Schema(
+      name = "TokenRequest",
+      description = "Provide your userId. applicationID is derived from server config (issuer).",
+      requiredProperties = {"userId"}
+  )
   public static class TokenRequest {
-    public String sub;
+    @Schema(description = "User identifier (subject). Also stamped as the `userID` claim.", example = "user123")
+    @NotBlank
+    @JsonAlias({"sub","userID"})   // accept sub/userID for compatibility
+    public String userId;
+
+    @Schema(description = "Audience claim (optional).", example = "vop-demo-client")
     public String aud;
-    public List<String> roles;
+
+    @Schema(description = "Authorities in Spring style (optional). Defaults to [\"ROLE_USER\"].",
+        example = "[\"ROLE_USER\",\"ROLE_ADMIN\"]")
+    public java.util.List<String> roles;
   }
+
 
   public static class TokenResponse {
     public final String token;
-    public final String expiresAt;
-    public final String issuer;
-    public TokenResponse(@JsonProperty("token") String token,
-        @JsonProperty("expiresAt") String expiresAt,
-        @JsonProperty("issuer") String issuer) {
+    public TokenResponse(@JsonProperty("token") String token) {
       this.token = token;
-      this.expiresAt = expiresAt;
-      this.issuer = issuer;
     }
   }
 
