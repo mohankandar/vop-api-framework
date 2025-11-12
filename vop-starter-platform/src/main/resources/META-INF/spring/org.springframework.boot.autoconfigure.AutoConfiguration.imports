@@ -1,1 +1,2 @@
 com.tnl.vop.platform.PlatformAutoConfiguration
+com.tnl.vop.platform.openapi.VopOpenApiSecurityAutoConfiguration

@@ -15,6 +15,10 @@ spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
+  data:
+    redis:
+      repositories:
+        enabled: false  # opt-in only; caching still works
 
 management:
   endpoints:
@@ -26,9 +30,13 @@ management:
 vop:
   security:
     api-key:
-      enabled: false
+      # Authentication is ALWAYS ON at framework level.
+      # Header name is constant across all apps/envs:
       header: X-API-Key
-      value: ${VOP_API_KEY:dev-key}   # for local quick tests
+      # Do NOT put the key here. Supply per-environment.
+  openapi:
+    enabled: true
+    global-security: true
   identity:
     http-enabled: false              # enable in non-local to enrich via HTTP
   data:
@@ -37,41 +45,24 @@ vop:
         enabled: true                # local-only embedded Redis (from starter)
         port: 6379
 
-# --- Resource server (JWT) – Example Okta wiring (disabled by default) ---
-#spring:
-#  security:
-#    oauth2:
-#      resourceserver:
-#        jwt:
-#          issuer-uri: https://your-okta-domain/oauth2/default
-#          audience: your-audience
+springdoc:
+  swagger-ui:
+    display-request-duration: true
+    filter: true
 
-# Logging hints (vop-logging-config supplies logback + masking)
 logging:
   level:
     root: INFO
     com.tnl.vop: INFO
-#spring:
-#  datasource:
-#    url: jdbc:oracle:thin:@//host:1521/ORCLCDB
-#    driver-class-name: oracle.jdbc.OracleDriver
-#    username: APP_USER
-#    password: ${DB_PASSWORD}
-#  jpa:
-#    database-platform: org.hibernate.dialect.OracleDialect
-#spring:
-#  datasource:
-#    url: jdbc:mysql://host:3306/vop_demo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    username: app
-#    password: ${DB_PASSWORD}
-#  jpa:
-#    database-platform: org.hibernate.dialect.MySQL8Dialect
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://host:5432/vop_demo
-#    driver-class-name: org.postgresql.Driver
-#    username: app
-#    password: ${DB_PASSWORD}
-#  jpa:
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # Quiet common framework chatter
+    org.apache.catalina: WARN
+    org.apache.coyote: WARN
+    org.springframework.web.servlet.DispatcherServlet: WARN
+    org.springframework.boot.web.servlet: WARN
+    org.springframework.data.repository.config: WARN
+    org.springframework.boot.actuate.endpoint.web: WARN
+    org.springframework.security: WARN
+    liquibase: WARN
+    org.springframework.orm.jpa: WARN
+    org.hibernate: WARN
+    org.hibernate.orm.deprecation: ERROR

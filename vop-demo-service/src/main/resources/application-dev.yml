@@ -28,8 +28,7 @@ management:
 vop:
   security:
     api-key:
-      enabled: false         # use JWT/Okta in dev if/when you wire it
-
+      value: ${VOP_API_KEY}  # set in DEV secrets/store
   identity:
     http-enabled: true       # allow identity enrichment via HTTP in dev (optional)
 

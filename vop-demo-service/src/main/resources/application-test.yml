@@ -22,12 +22,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,env,loggers"
+        include: "health,info"
 
 vop:
   security:
     api-key:
-      enabled: false
+      value: ${VOP_API_KEY}  # set in TEST secrets/store
 
   identity:
     http-enabled: true       # or false if your test env doesn’t have identity

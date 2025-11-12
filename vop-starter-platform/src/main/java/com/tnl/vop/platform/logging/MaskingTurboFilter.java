@@ -1,4 +1,4 @@
-package com.tnl.vop.logging;
+package com.tnl.vop.platform.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

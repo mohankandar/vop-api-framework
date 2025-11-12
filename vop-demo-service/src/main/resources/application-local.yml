@@ -27,7 +27,36 @@ vop:
         port: 6379
         only-when-local-profile: true
   security:
+    web:
+      permit-paths:
+        - /api/ping
+        - /api/token
     api-key:
       enabled: true
       header: X-API-Key
-      value: local-key
+      value: local-key   # local default for convenience
+    token-endpoint:
+      enabled: true
+      issuer: vop-demo
+      expiry-seconds: 900
+      hmac-secret: "${VOP_JWT_HS256_SECRET:use-a-32+byte-demo-secret-string-here}"
+  debug:
+    log-headers: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,env,loggers"
+  health:
+    redis:
+      enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.tnl.vop.demo: DEBUG
+    com.tnl.vop.security: DEBUG
+    com.tnl.vop.platform: DEBUG
+    org.springframework.security: DEBUG
+    com.tnl.vop.demo.debug: DEBUG

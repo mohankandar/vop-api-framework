@@ -44,12 +44,6 @@
       <artifactId>vop-starter-identity-client</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.tnl.vop</groupId>
-      <artifactId>vop-logging-config</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
     <!-- DB driver: H2 for local/demo -->
     <dependency>
       <groupId>com.h2database</groupId>
