@@ -20,8 +20,7 @@
                 <timestamp/>
                 <version/>
                 <pattern>
-                    <pattern>
-                        {
+                    <pattern>{
                         "level":"%level",
                         "logger":"%logger{36}",
                         "thread":"%thread",
@@ -31,10 +30,9 @@
                         "correlationId":"%X{correlationId}",
                         "user":"%X{user}",
                         "app":"${APP_NAME}"
-                        }
-                    </pattern>
+                        }</pattern>
                 </pattern>
-                <mdc/>
+                <!-- no <mdc/> to avoid duplicates -->
                 <stackTrace/>
             </providers>
         </encoder>
@@ -45,11 +43,9 @@
         <then>
             <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${LOG_PATH}/${APP_NAME}.log</file>
-                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                     <fileNamePattern>${LOG_PATH}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                        <maxFileSize>${ROLLING_MAX_FILE_SIZE}</maxFileSize>
-                    </timeBasedFileNamingAndTriggeringPolicy>
+                    <maxFileSize>${ROLLING_MAX_FILE_SIZE}</maxFileSize>
                     <maxHistory>${ROLLING_MAX_HISTORY}</maxHistory>
                     <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
                 </rollingPolicy>
@@ -57,8 +53,7 @@
                     <providers>
                         <timestamp/><version/>
                         <pattern>
-                            <pattern>
-                                {
+                            <pattern>{
                                 "level":"%level",
                                 "logger":"%logger{36}",
                                 "thread":"%thread",
@@ -68,10 +63,9 @@
                                 "correlationId":"%X{correlationId}",
                                 "user":"%X{user}",
                                 "app":"${APP_NAME}"
-                                }
-                            </pattern>
+                                }</pattern>
                         </pattern>
-                        <mdc/><stackTrace/>
+                        <stackTrace/>
                     </providers>
                 </encoder>
             </appender>
