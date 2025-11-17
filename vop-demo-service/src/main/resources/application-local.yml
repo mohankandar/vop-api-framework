@@ -36,12 +36,27 @@ vop:
       header: X-API-Key
       value: local-key   # local default for convenience
     token-endpoint:
+      # Explicitly enable the token endpoint for local development
       enabled: true
-      issuer: vop-demo
+
+      # Only allow it under the "local" profile by default
+      allowed-profiles: "local"
+
+      # Token metadata
+      issuer: "vop-demo-local"
       expiry-seconds: 900
-      hmac-secret: "${VOP_JWT_HS256_SECRET:use-a-32+byte-demo-secret-string-here}"
+
+      # HS256 secret for signing tokens (for local only – override via env if desired)
+      hmac-secret: "${VOP_JWT_HS256_SECRET:local-demo-secret}"
+
+      # Restrict callers by CIDR – only localhost here - empty ⇒ no IP restriction.
+      allowed-cidrs:
+        - "127.0.0.1/32"
   debug:
     log-headers: true
+  partner-service:
+    external-echo:
+      base-url: https://httpbin.org
 
 management:
   endpoints:
