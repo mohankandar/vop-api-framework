@@ -1,5 +1,9 @@
 package com.tnl.vop.security;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "vop.security")
@@ -42,7 +46,13 @@ public class SecurityProperties {
     public static class ApiKey {
         private boolean enabled = false;
         private String header = "X-API-Key";
+
+        /** Backward compatibility: single key (old behavior) */
         private String value = ""; // set per-env
+
+        /** Recommended: multi-client keys (supports rotation + identity) */
+        private Map<String, Client> clients = new LinkedHashMap<>();
+
         private String applicationNameHeader = "X-App-Name";
         private String appTokenHeader = "X-App-Token";
         private String firstNameHeader = "X-User-FirstName";
@@ -51,10 +61,16 @@ public class SecurityProperties {
 
         public boolean isEnabled() { return enabled; }
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
         public String getHeader() { return header; }
         public void setHeader(String header) { this.header = header; }
+
         public String getValue() { return value; }
         public void setValue(String value) { this.value = value; }
+
+        public Map<String, Client> getClients() { return clients; }
+        public void setClients(Map<String, Client> clients) { this.clients = clients; }
+
         public String getApplicationNameHeader() { return applicationNameHeader; }
         public void setApplicationNameHeader(String s) { this.applicationNameHeader = s; }
         public String getAppTokenHeader() { return appTokenHeader; }
@@ -65,5 +81,12 @@ public class SecurityProperties {
         public void setLastNameHeader(String s) { this.lastNameHeader = s; }
         public String getNetworkIdHeader() { return networkIdHeader; }
         public void setNetworkIdHeader(String s) { this.networkIdHeader = s; }
+
+        public static class Client {
+            /** Multiple keys allowed for rotation */
+            private List<String> keys = new ArrayList<>();
+            public List<String> getKeys() { return keys; }
+            public void setKeys(List<String> keys) { this.keys = keys; }
+        }
     }
 }

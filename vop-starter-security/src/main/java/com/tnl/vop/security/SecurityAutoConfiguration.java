@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -138,18 +139,28 @@ public class SecurityAutoConfiguration {
     return f;
   }
 
+
   @Bean
   @ConditionalOnMissingBean(JwtDecoder.class)
-  public JwtDecoder vopJwtDecoder(TokenEndpointProperties props) {
+  public JwtDecoder vopJwtDecoder(TokenEndpointProperties props, Environment env) {
+
+    boolean production = env.getProperty("vop.framework.production", Boolean.class, false);
+    if (production) {
+      throw new IllegalStateException(
+          "vop.framework.production=true: HS256/HMAC JWT is not allowed. " +
+              "Configure OIDC/Okta issuer/jwks in a later phase, or set vop.framework.production=false."
+      );
+    }
+
     // Use the same secret the token endpoint uses (HS256 for now)
     byte[] keyBytes = props.getHmacSecret().getBytes(StandardCharsets.UTF_8);
     if (keyBytes.length < 32) {
-      throw new IllegalStateException(
-          "vop.security.token-endpoint.hmac-secret must be >= 32 bytes");
+      throw new IllegalStateException("vop.security.token-endpoint.hmac-secret must be >= 32 bytes");
     }
     var key = new SecretKeySpec(keyBytes, "HmacSHA256");
     return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
   }
+
 
   @Bean
   @ConditionalOnMissingBean(BearerTokenResolver.class)

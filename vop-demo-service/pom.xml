@@ -71,6 +71,10 @@
       <artifactId>embedded-redis</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -78,6 +82,50 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>7.4.0</version>
+        <executions>
+          <execution>
+            <id>generate-openapi-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <generatorName>spring</generatorName>
+              <library>spring-boot</library>
+
+              <inputSpec>${project.basedir}/src/main/resources/openapi/api.yml</inputSpec>
+              <apiPackage>com.tnl.vop.demo.generated.api</apiPackage>
+              <modelPackage>com.tnl.vop.demo.generated.model</modelPackage>
+              <generateSupportingFiles>false</generateSupportingFiles>
+
+              <configOptions>
+                <useSpringBoot3>true</useSpringBoot3>
+                <useTags>true</useTags>
+                <interfaceOnly>true</interfaceOnly>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <dateLibrary>java8</dateLibrary>
+                <openApiNullable>false</openApiNullable>
+              </configOptions>
+
+              <!-- Map OpenAPI ErrorDetail/ErrorResponse to VOP core types -->
+              <importMappings>
+                <importMapping>ErrorDetail=com.tnl.vop.core.api.ErrorDetail</importMapping>
+                <importMapping>ErrorResponse=com.tnl.vop.core.api.ApiResponse</importMapping>
+              </importMappings>
+
+              <typeMappings>
+                <typeMapping>ErrorDetail=com.tnl.vop.core.api.ErrorDetail</typeMapping>
+                <typeMapping>ErrorResponse=com.tnl.vop.core.api.ApiResponse</typeMapping>
+              </typeMappings>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

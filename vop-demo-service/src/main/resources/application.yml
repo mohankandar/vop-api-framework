@@ -24,7 +24,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,env,loggers"
+        include: "health,info,metrics"
 
 # --- Security (defaults; override per env) ---
 vop:

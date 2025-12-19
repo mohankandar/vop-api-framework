@@ -9,7 +9,8 @@ public final class VopDefaultSecurityPaths {
       "/swagger-ui/**",
       "/swagger-ui.html",
       "/v3/api-docs/**",
-      "/actuator/**",
+      "/actuator/health/**",
+      "/actuator/info",
       "/error",
       "/webjars/**",
       "/favicon.ico"
