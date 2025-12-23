@@ -25,5 +25,6 @@
         <module>vop-starter-security</module>
         <module>vop-starter-platform</module>
         <module>vop-demo-service</module>
+        <module>vop-reference-service</module>
     </modules>
 </project>

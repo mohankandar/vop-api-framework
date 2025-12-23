@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: vop-reference-service
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+
+vop:
+  framework:
+    production: false
+
+  # --- Security (supply keys per env) ---
+  security:
+    api-key:
+      header: X-API-Key
+      # enabled true/false per env; keys supplied per env
+    web:
+      permit-paths:
+        - /public/**
+        - /swagger-ui/**
+        - /v3/api-docs/**
+
+  openapi:
+    enabled: true
+    global-security: true
+
+  data:
+    redis:
+      embedded:
+        enabled: true
+        port: 6379
+        only-when-local-profile: true
+
+reference:
+  partner:
+    echo-base-url: http://localhost:${server.port}
+
+springdoc:
+  swagger-ui:
+    display-request-duration: true
+    filter: true
+
+logging:
+  level:
+    root: INFO
+    com.tnl.vop: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    liquibase: WARN
+
+servlet:
+  context-path: /api/v1/rest

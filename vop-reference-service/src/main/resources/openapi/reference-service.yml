@@ -1,0 +1,276 @@
+openapi: 3.0.3
+info:
+  title: VOP Reference Service API
+  version: 1.0.0
+  description: Contract-first reference service showcasing VOP starters (security, data, logging, clients).
+
+paths:
+  /public/ping:
+    get:
+      tags: [Public]
+      operationId: ping
+      summary: Public ping (permitAll)
+      responses:
+        '200':
+          description: Pong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /me:
+    get:
+      tags: [Identity]
+      operationId: getMe
+      summary: JWT-only identity endpoint
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current principal info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /contracts:
+    post:
+      tags: [Contracts]
+      operationId: createContract
+      summary: Create a contract record (JWT ROLE_USER)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContractRequest'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /contracts/{id}:
+    get:
+      tags: [Contracts]
+      operationId: getContractById
+      summary: Get contract by id (JWT ROLE_USER)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContractResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /partner/status:
+    get:
+      tags: [Partner]
+      operationId: getPartnerStatus
+      summary: API-key-only partner status endpoint
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Partner status with client identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerStatusResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /partner/echo:
+    get:
+      tags: [Partner]
+      operationId: partnerEcho
+      summary: Outbound client demo (calls configured partner echo URL)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Echo from partner endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartnerEchoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  schemas:
+    ErrorDetail:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details: { type: object, additionalProperties: true }
+
+    ErrorResponse:
+      description: VOP envelope for errors
+      type: object
+      properties:
+        status: { type: string, example: error }
+        data: { nullable: true }
+        error: { $ref: '#/components/schemas/ErrorDetail' }
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    PingPayload:
+      type: object
+      properties:
+        message: { type: string, example: pong }
+        service: { type: string, example: vop-reference-service }
+
+    PingResponse:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        data: { $ref: '#/components/schemas/PingPayload' }
+        error: { $ref: '#/components/schemas/ErrorDetail' }   # <-- ADD
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    MePayload:
+      type: object
+      properties:
+        authType: { type: string, example: JWT }
+        principal: { type: string, example: user123 }
+        authorities:
+          type: array
+          items: { type: string }
+        claims:
+          type: object
+          additionalProperties: true
+
+    MeResponse:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        data: { $ref: '#/components/schemas/MePayload' }
+        error: { $ref: '#/components/schemas/ErrorDetail' }   # <-- ADD
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    PartnerStatusPayload:
+      type: object
+      properties:
+        clientId: { type: string, example: partnerA }
+        authorities:
+          type: array
+          items: { type: string }
+
+    PartnerStatusResponse:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        data: { $ref: '#/components/schemas/PartnerStatusPayload' }
+        error: { $ref: '#/components/schemas/ErrorDetail' }   # <-- ADD
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    CreateContractRequest:
+      type: object
+      required: [externalRef, title]
+      properties:
+        externalRef: { type: string, maxLength: 64, example: CNTR-10001 }
+        title: { type: string, maxLength: 256, example: Warranty Contract }
+
+    ContractPayload:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        externalRef: { type: string }
+        title: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ContractResponse:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        data: { $ref: '#/components/schemas/ContractPayload' }
+        error: { $ref: '#/components/schemas/ErrorDetail' }   # <-- ADD
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }
+
+    PartnerEchoPayload:
+      type: object
+      properties:
+        upstreamStatus: { type: integer, example: 200 }
+        body: { type: string, example: "{\"hello\":\"world\"}" }
+
+    PartnerEchoResponse:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        data: { $ref: '#/components/schemas/PartnerEchoPayload' }
+        error: { $ref: '#/components/schemas/ErrorDetail' }   # <-- ADD
+        correlationId: { type: string }
+        timestamp: { type: string, format: date-time }

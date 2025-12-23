@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.tnl.vop</groupId>
+    <artifactId>vop-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <relativePath>../vop-parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>vop-reference-service</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <name>VOP :: Reference Service</name>
+  <description>Contract-first reference service showcasing VOP starters</description>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <!-- VOP framework -->
+    <dependency>
+      <groupId>com.tnl.vop</groupId>
+      <artifactId>vop-starter-platform</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tnl.vop</groupId>
+      <artifactId>vop-starter-security</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tnl.vop</groupId>
+      <artifactId>vop-starter-data</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tnl.vop</groupId>
+      <artifactId>vop-data-jpa</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- DB driver: H2 for local/reference -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Optional clients -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webflux</artifactId>
+    </dependency>
+
+    <!-- JPA (explicit, consistent with demo) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- Embedded Redis (local) -->
+    <dependency>
+      <groupId>com.github.codemonstur</groupId>
+      <artifactId>embedded-redis</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>7.4.0</version>
+        <executions>
+          <execution>
+            <id>generate-openapi-sources</id>
+            <phase>generate-sources</phase>
+            <goals><goal>generate</goal></goals>
+            <configuration>
+              <generatorName>spring</generatorName>
+              <library>spring-boot</library>
+
+              <inputSpec>${project.basedir}/src/main/resources/openapi/reference-service.yml</inputSpec>
+              <apiPackage>com.tnl.vop.reference.generated.api</apiPackage>
+              <modelPackage>com.tnl.vop.reference.generated.model</modelPackage>
+              <generateSupportingFiles>false</generateSupportingFiles>
+
+              <configOptions>
+                <useSpringBoot3>true</useSpringBoot3>
+                <useTags>true</useTags>
+                <interfaceOnly>true</interfaceOnly>
+                <skipDefaultInterface>true</skipDefaultInterface>
+                <useBeanValidation>true</useBeanValidation>
+                <dateLibrary>java8</dateLibrary>
+                <openApiNullable>false</openApiNullable>
+              </configOptions>
+
+              <!-- Map OpenAPI ErrorDetail/ErrorResponse to VOP core types -->
+              <importMappings>
+                <importMapping>ErrorDetail=com.tnl.vop.core.api.ErrorDetail</importMapping>
+                <importMapping>ErrorResponse=com.tnl.vop.core.api.ApiResponse</importMapping>
+              </importMappings>
+              <typeMappings>
+                <typeMapping>ErrorDetail=com.tnl.vop.core.api.ErrorDetail</typeMapping>
+                <typeMapping>ErrorResponse=com.tnl.vop.core.api.ApiResponse</typeMapping>
+              </typeMappings>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

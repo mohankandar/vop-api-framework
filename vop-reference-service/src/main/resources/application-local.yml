@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:ref;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+server:
+  port: 8080
+
+vop:
+  security:
+    api-key:
+      enabled: true
+      clients:
+        partnerA:
+          keys:
+            - "dev-partnerA-key"
+    token-endpoint:
+      enabled: true
+      hmac-secret: "0123456789abcdef0123456789abcdef"  # 32+ bytes for demo
+      issuer: "vop-reference-service"
+      expiry-seconds: 900
+  reference:
+      partner:
+        base-url: http://localhost:${server.port}
